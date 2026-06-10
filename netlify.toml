@@ -1,0 +1,10 @@
+# Netlify 設定
+[build]
+  publish = "public"
+  command = ""        # 前端為純靜態，不需 build
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# 排程在 crawl.mjs 內以 export const config = { schedule } 宣告（每 6 小時）

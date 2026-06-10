@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EDT 市場・競業情報戰情室</title>
+<style>
+  :root{
+    --bg:#EDF1F5; --surface:#fff; --ink:#16273B; --navy:#11314F; --sub:#5A6B7C;
+    --faint:#94A2B1; --line:#E3E9F0; --blue:#2563EB; --blueSoft:#E7EEFC;
+    --teal:#0E9488; --tealSoft:#DCF1EF; --amber:#E08A0B; --amberSoft:#FBEFD8;
+    --red:#D8453E; --redSoft:#FAE3E2; --green:#1B9C5C; --greenSoft:#DEF1E6;
+    --spine:#12324E; --slate:#C6D0DB;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Inter","Segoe UI","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);font-size:17px}
+  .app{display:flex;min-height:100vh}
+  /* 側欄 */
+  .side{width:208px;flex-shrink:0;background:var(--navy);color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:6px}
+  .brand{display:flex;align-items:center;gap:10px;padding:4px 10px 18px}
+  .logo{width:34px;height:34px;border-radius:9px;background:var(--blue);display:grid;place-items:center;font-weight:800;font-size:17px}
+  .nav{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;border:none;cursor:pointer;
+    background:transparent;color:#C2D2E2;font-size:15px;font-weight:600;text-align:left;width:100%;font-family:inherit}
+  .nav.on{background:var(--blue);color:#fff}
+  .nav .dot{font-size:11px}
+  .hint{margin-top:auto;padding:12px;background:rgba(255,255,255,.06);border-radius:10px;font-size:12px;color:#A9BED2;line-height:1.6}
+  /* 主區 */
+  main{flex:1;min-width:0;display:flex;flex-direction:column}
+  header.top{background:var(--surface);border-bottom:1px solid var(--line);padding:16px 28px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .h1{font-size:22px;font-weight:800}
+  .hsub{font-size:13.5px;color:var(--faint);margin-top:2px}
+  .pill{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .wrap{padding:28px;display:flex;flex-direction:column;gap:24px;overflow:auto}
+  .grid{display:grid;gap:18px}
+  .k4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .c2{grid-template-columns:1fr 1.3fr}
+  .c4{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+  .c3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  @media(max-width:880px){.c2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(16,39,64,.04)}
+  .card h3{margin:0;font-size:18px;font-weight:700}
+  .card .csub{font-size:13.5px;color:var(--faint);margin-top:3px}
+  .chead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+  /* KPI */
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(16,39,64,.04)}
+  .kpi.click{cursor:pointer}
+  .kpi .row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .kpi .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center}
+  .kpi .lab{font-size:14.5px;color:var(--sub);font-weight:600}
+  .kpi .val{font-size:34px;font-weight:800;line-height:1.05}
+  .kpi .unit{font-size:17px;font-weight:700;color:var(--sub);margin-left:5px}
+  .kpi .note{font-size:12.5px;color:var(--faint);margin-top:12px}
+  /* 脊椎 */
+  .spine{background:var(--spine);border-radius:18px;padding:20px 22px 24px}
+  .spine .stitle{display:flex;align-items:center;gap:9px;margin-bottom:16px;color:#fff}
+  .ocard{background:#fff;border-radius:14px;padding:18px;border-top:4px solid}
+  .ocard .oh{display:flex;align-items:center;gap:9px;margin-bottom:12px;font-size:17px;font-weight:800}
+  .ocard .read{font-size:14.5px;line-height:1.65;margin-bottom:12px}
+  .ocard .act{border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6;margin-bottom:12px}
+  .ocard .foot{display:flex;justify-content:space-between;align-items:center}
+  /* 文章 */
+  .art{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;cursor:pointer}
+  .art:hover{border-color:var(--blue)}
+  .art .meta{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .art .src{font-size:12.5px;color:var(--faint)}
+  .art .title{font-size:16.5px;font-weight:700;line-height:1.4}
+  .art .take{font-size:14px;color:var(--sub);line-height:1.55}
+  /* chips */
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:14px;padding:6px 12px;border-radius:8px;font-weight:600;margin:0 8px 8px 0}
+  /* donut */
+  .donut{width:160px;height:160px;border-radius:50%;display:grid;place-items:center;margin:8px auto}
+  .donut::after{content:"";width:104px;height:104px;border-radius:50%;background:#fff;grid-area:1/1}
+  .donut .dl{grid-area:1/1;z-index:1;text-align:center}
+  /* 連結/按鈕 */
+  .link{font-size:13px;font-weight:600;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+  .btn{padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--blue);
+    font-weight:600;font-size:14.5px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  /* modal */
+  .mask{position:fixed;inset:0;background:rgba(16,39,64,.45);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50}
+  .modal{background:#fff;border-radius:16px;max-width:620px;width:100%;padding:26px;max-height:86vh;overflow:auto}
+  .modal h2{margin:0 0 6px;font-size:20px;line-height:1.4}
+  .empty{padding:26px;text-align:center;color:var(--faint);font-size:15px;line-height:1.7}
+  .banner{font-size:13px;color:var(--faint);text-align:center;padding:4px 0 10px}
+</style>
+</head>
+<body>
+<div class="app" id="app"><div style="padding:40px;color:#94A2B1">載入中…</div></div>
+
+<script>
+const T={bg:"#EDF1F5",surface:"#fff",ink:"#16273B",navy:"#11314F",sub:"#5A6B7C",faint:"#94A2B1",
+  line:"#E3E9F0",blue:"#2563EB",blueSoft:"#E7EEFC",teal:"#0E9488",tealSoft:"#DCF1EF",amber:"#E08A0B",
+  amberSoft:"#FBEFD8",red:"#D8453E",redSoft:"#FAE3E2",green:"#1B9C5C",greenSoft:"#DEF1E6",spine:"#12324E",slate:"#C6D0DB"};
+
+let DATA=null, view="總覽";
+const NAV=["總覽","我方能見度","市場訊號","競業動態","TA 四切角"];
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fdate(s){ if(!s)return"—"; try{return new Date(s).toLocaleDateString("zh-TW",{year:"numeric",month:"2-digit",day:"2-digit"});}catch(e){return s;} }
+
+const TA=[
+ {role:"IT / MIS 工程",color:T.blue,daily:"維運多國據點網路、處理跨國連線與資安告警",
+  mean:"新廠＝又一個要納管的跨境節點，半夜跨時區救火風險上升。",
+  angle:"新廠連回總部的專線＋資安一條龍接好，不用你自己跨時區扛。"},
+ {role:"廠辦 / 廠務主管",color:T.teal,daily:"盯建廠進度、設備到位、現場能不能準時開工",
+  mean:"網路、機房沒到位，產線就開不了——時程壓力直接落在你身上。",
+  angle:"弱電、機房、網路落地，當地有工程師到場，不是遠端踢皮球。"},
+ {role:"副總 / 事業部",color:T.amber,daily:"看擴張 ROI、控成本與風險、決定外包與否",
+  mean:"多國擴廠＝供應商管理變複雜、出事責任難釐清。",
+  angle:"一個窗口包跨國 IT 落地，少管 N 家廠商，報修一支電話。"},
+ {role:"CIO / 資訊長",color:T.navy,daily:"訂跨國 IT 治理、合規、資安政策、供應鏈風險",
+  mean:"新據點＝治理與合規邊界擴大，設備來源與稽核要扛得住。",
+  angle:"跨境網路＋資安加值同源、設備來源清楚，標案／稽核都撐得住。"}
+];
+
+async function load(){
+  try{
+    const r=await fetch("/.netlify/functions/data");
+    if(!r.ok) throw new Error("API "+r.status);
+    DATA=await r.json();
+    if(DATA.error) throw new Error(DATA.error);
+  }catch(e){ DATA={_err:e.message,market:[],competitor:[],visibility:null}; }
+  render();
+}
+
+function pill(text,color,bg){return `<span class="pill" style="color:${color};background:${bg}">${text}</span>`;}
+
+function kpi(ic,lab,val,unit,note,accent,soft,target){
+  return `<div class="kpi ${target?"click":""}" ${target?`onclick="go('${target}')"`:""}>
+    <div class="row"><div class="ic" style="background:${soft}">${ic}</div><div class="lab">${lab}</div></div>
+    <div><span class="val">${val}</span>${unit?`<span class="unit">${unit}</span>`:""}</div>
+    <div class="note">${note}${target?" ↗":""}</div></div>`;
+}
+
+function artRow(a,idx,list){
+  const colorMap={機會:T.green,趨勢:T.blue,市場:T.teal,客戶:T.amber,風險:T.red};
+  return `<div class="art" onclick="openArt('${list}',${idx})">
+    <div class="meta"><span class="src">${esc(a.source||a.entity||"")} · ${fdate(a.published_at)}</span>
+      <span class="link">點開看內容 ↗</span></div>
+    <div class="title">${esc(a.title)}</div>
+    <div class="take">${esc((a.summary||"").slice(0,90))}${(a.summary||"").length>90?"…":""}</div></div>`;
+}
+
+function visibilitySection(){
+  const v=DATA.visibility;
+  if(!v) return `<div class="card"><div class="chead"><div><h3>我方能見度體檢</h3>
+    <div class="csub">官網爬取快照</div></div>${pill("尚無資料",T.amber,T.amberSoft)}</div>
+    <div class="empty">尚未執行爬取。請先到 Netlify → Functions → <b>crawl</b> → Trigger 跑第一次（見 README）。</div></div>`;
+  const found=v.keywords_found||[], missing=v.keywords_missing||[];
+  const tot=found.length+missing.length||1, pct=Math.round(found.length/tot*100);
+  const chips=(arr,color,soft,mark)=>arr.map(k=>`<span class="chip" style="color:${color};background:${soft}">${mark} ${esc(k)}</span>`).join("");
+  return `<div>
+    <div style="display:flex;align-items:center;gap:9px;margin:2px 0 14px">
+      <span style="font-size:20px;font-weight:800">我方能見度體檢</span>
+      ${pill("真實：爬取 edtns.net",T.green,T.greenSoft)}</div>
+    <div class="grid c2">
+      <div class="card"><div class="chead"><div><h3>核心差異化字覆蓋</h3>
+        <div class="csub">首頁爬蟲讀得到哪些差異化字</div></div></div>
+        <div class="donut" style="background:conic-gradient(${T.green} 0 ${pct}%, ${T.red} 0)">
+          <div class="dl"><div style="font-size:30px;font-weight:800;color:${pct<50?T.red:T.green}">${pct}%</div>
+          <div style="font-size:12px;color:${T.faint}">已涵蓋</div></div></div>
+        <div style="text-align:center;font-size:13.5px;color:${T.sub}">已涵蓋 ${found.length} · 缺漏 ${missing.length}</div></div>
+      <div class="card"><div class="chead"><div><h3>關鍵字檢核</h3>
+        <div class="csub">${v.crawlable?"首頁本體可爬":"首頁為 JS 空殼，爬蟲僅讀得到 meta"} · 檢查於 ${fdate(v.checked_at)}</div></div></div>
+        <div>${found.length?chips(found,T.green,T.greenSoft,"✓"):`<span style="color:${T.faint};font-size:14px">核心差異化字幾乎都讀不到</span>`}
+        ${chips(missing,T.red,T.redSoft,"✗")}</div></div>
+    </div></div>`;
+}
+
+function marketSection(full){
+  const list=DATA.market||[];
+  const shown=full?list:list.slice(0,3);
+  let body;
+  if(!list.length){
+    body=`<div class="empty">尚無市場訊號。請先觸發 <b>crawl</b> 跑第一次抓取（見 README）。</div>`;
+  }else{
+    body=shown.map((a,i)=>artRow(a,i,"market")).join("");
+    if(!full&&list.length>3) body+=`<button class="btn" style="margin-top:14px" onclick="go('市場訊號')">查看全部 ${list.length} 則 ↗</button>`;
+  }
+  return `<div class="card"><div class="chead"><div><h3>市場訊號</h3>
+    <div class="csub">每 6 小時自動抓取 · 越南／印尼／東南亞建廠</div></div>${pill("真實抓取",T.teal,T.tealSoft)}</div>
+    <div style="display:flex;flex-direction:column;gap:12px">${body}</div></div>`;
+}
+
+function competitorSection(){
+  const list=DATA.competitor||[];
+  let body;
+  if(!list.length){
+    body=`<div class="empty">尚無競業訊號。觸發 <b>crawl</b> 後，是方／第一線／中華電信的新聞會自動進來。<br>
+      要新增競業：在 Supabase <b>feeds</b> 表加一列（domain=competitor）。</div>`;
+  }else{
+    body=list.slice(0,10).map((a,i)=>artRow(a,i,"competitor")).join("");
+  }
+  return `<div class="card"><div class="chead"><div><h3>競業動態</h3>
+    <div class="csub">是方電訊 · 第一線 · 中華電信企業 · 每 6 小時更新</div></div>${pill("已啟用",T.green,T.greenSoft)}</div>
+    <div style="display:flex;flex-direction:column;gap:12px">${body}</div></div>`;
+}
+
+function taSection(){
+  const sig=(DATA.market&&DATA.market[0])?DATA.market[0].title:"越南／印尼建廠潮（待抓取後自動帶入最新一則）";
+  const cards=TA.map(p=>`<div class="card" style="padding:18px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:38px;height:38px;border-radius:10px;background:${T.bg};display:grid;place-items:center;color:${p.color};font-weight:800">●</div>
+      <div style="font-size:16.5px;font-weight:800">${p.role}</div></div>
+    <div style="font-size:12.5px;color:${T.faint}">他每天在忙</div>
+    <div style="font-size:14px;color:${T.sub};line-height:1.5;margin-bottom:10px">${p.daily}</div>
+    <div style="font-size:12.5px;color:${T.faint}">這訊號對他的意義</div>
+    <div style="font-size:14px;color:${T.ink};line-height:1.55;margin-bottom:10px">${p.mean}</div>
+    <div style="background:#EEF3F8;border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.55">
+      <b style="color:${p.color}">怎麼切入　</b>${p.angle}</div></div>`).join("");
+  return `<div>
+    <div style="display:flex;align-items:center;gap:9px;margin:2px 0 8px">
+      <span style="font-size:20px;font-weight:800">訊號落地：對四種人分別代表什麼</span>
+      ${pill("結合各角色日常工作 · 內部判讀用",T.sub,"#E9EEF3")}</div>
+    <div class="spine" style="padding:12px 16px;border-radius:12px;margin-bottom:14px;color:#fff;font-size:14.5px">
+      本期訊號：${esc(sig)}</div>
+    <div class="grid c4">${cards}</div></div>`;
+}
+
+function spineSection(){
+  const mCount=(DATA.market||[]).length;
+  const v=DATA.visibility; const miss=v?(v.keywords_missing||[]).length:0;
+  const outs=[
+    {tag:"客戶需求",color:T.blue,soft:T.blueSoft,
+     read:"客戶反覆問「跨境網路穩不穩、出事有沒有人到現場」——買的是『現場到得了人』，不是技術最深。",
+     act:"把『在地工程師到場』做成可量化承諾（到場時數 SLA），放進 DM 與報價。",role:"廠辦・副總",src:"服務工單 + 市場訊號"},
+    {tag:"市場需求",color:T.teal,soft:T.tealSoft,
+     read:`目前抓到 ${mCount} 則建廠／投資訊號，市場缺『一個窗口包跨國 IT 落地』。`,
+     act:"把建廠新聞轉成業務線索卡，主打單一窗口、在地落地。",role:"副總・CIO",src:"市場訊號（真實抓取）"},
+    {tag:"營運方向",color:T.amber,soft:T.amberSoft,
+     read:`官網對爬蟲是空殼，核心差異化字 ${miss} 個讀不到——搜尋與 AI 不可能看見你。`,
+     act:"官網補預渲染＋關鍵字；改走外部媒體露出（iThome／DIGITIMES）養外部引用。",role:"行銷・CIO",src:"官網能見度體檢"}
+  ];
+  return `<div class="spine">
+    <div class="stitle"><span style="font-weight:800;font-size:18px">本期判讀與建議</span>
+      <span style="color:#9DB4CC;font-size:13px">以終為始 · 一切面板都餵養這三格</span></div>
+    <div class="grid c3">${outs.map(o=>`<div class="ocard" style="border-top-color:${o.color}">
+      <div class="oh"><div style="width:34px;height:34px;border-radius:9px;background:${o.soft};display:grid;place-items:center;color:${o.color}">●</div>${o.tag}</div>
+      <div class="read">${o.read}</div>
+      <div class="act" style="background:${o.soft}"><b style="color:${o.color}">建議　</b>${o.act}</div>
+      <div class="foot">${pill(o.role,o.color,o.soft)}<span style="font-size:12px;color:${T.faint}">來源：${o.src}</span></div></div>`).join("")}</div></div>`;
+}
+
+function render(){
+  const isOv=view==="總覽";
+  const navHtml=NAV.map(k=>`<button class="nav ${view===k?"on":""}" onclick="go('${k}')"><span class="dot">●</span>${k}</button>`).join("");
+  const errBanner=DATA._err?`<div class="card" style="border-color:${T.redSoft};background:${T.redSoft}">
+    <b style="color:${T.red}">連不到後端</b>　${esc(DATA._err)}。請確認已設定環境變數並部署函式（見 README）。</div>`:"";
+
+  const visV=DATA.visibility;
+  const visVal=visV?(visV.crawlable?"可爬":"偏低"):"—";
+  const kpis=`<div class="grid k4">
+    ${kpi("👁","官網能見度體檢",visVal,"","爬蟲只讀到 meta · 點看詳情",T.red,T.redSoft,"我方能見度")}
+    ${kpi("📰","市場訊號",(DATA.market||[]).length,"則","自動抓取 · 點看文章",T.teal,T.tealSoft,"市場訊號")}
+    ${kpi("🏢","競業訊號",(DATA.competitor||[]).length,"則","是方／第一線／中華 · 點看",T.amber,T.amberSoft,"競業動態")}
+    ${kpi("🧭","本期營運建議","3","條","見下方判讀與建議",T.blue,T.blueSoft,"")}
+  </div>`;
+
+  let sections="";
+  if(isOv){ sections=kpis+spineSection()+visibilitySection()+marketSection(false)+competitorSection()+taSection(); }
+  else if(view==="我方能見度"){ sections=kpis+visibilitySection(); }
+  else if(view==="市場訊號"){ sections=kpis+marketSection(true); }
+  else if(view==="競業動態"){ sections=kpis+competitorSection(); }
+  else if(view==="TA 四切角"){ sections=kpis+taSection(); }
+
+  document.getElementById("app").innerHTML=`
+  <aside class="side">
+    <div class="brand"><div class="logo">E</div>
+      <div><div style="font-size:16px;font-weight:800">EDT 戰情室</div>
+      <div style="font-size:11.5px;color:#9DB4CC">Intelligence War Room</div></div></div>
+    ${navHtml}
+    <div class="hint">以終為始：每週吐出可被採用的營運建議，而非監控數字。</div>
+  </aside>
+  <main>
+    <header class="top">
+      <div><div class="h1">市場・競業情報戰情室</div>
+        <div class="hsub">資料更新：${DATA.generated_at?fdate(DATA.generated_at):"—"}　·　目的：客戶需求 · 市場需求 · 營運方向</div></div>
+      ${pill("● 即時資料（Supabase + 每 6 小時爬取）",T.green,T.greenSoft)}
+    </header>
+    <div class="wrap">${errBanner}${sections}
+      <div class="banner">即時版 · 市場／競業每 6 小時自動更新；官網能見度每次爬取快照。文章僅存摘要＋連結（全文走原文）。</div>
+    </div>
+  </main>`;
+}
+
+function go(v){ view=v; render(); window.scrollTo(0,0); }
+
+function openArt(listName,idx){
+  const a=(DATA[listName]||[])[idx]; if(!a)return;
+  const mask=document.createElement("div"); mask.className="mask";
+  mask.onclick=(e)=>{ if(e.target===mask) mask.remove(); };
+  mask.innerHTML=`<div class="modal">
+    <div style="font-size:12.5px;color:${T.faint};margin-bottom:6px">${esc(a.source||a.entity||"")} · ${fdate(a.published_at)}</div>
+    <h2>${esc(a.title)}</h2>
+    <div style="font-size:15px;color:${T.sub};line-height:1.75;margin:14px 0">${esc(a.summary||"（此來源未提供摘要，請點原文閱讀）")}</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="this.closest('.mask').remove()">關閉</button>
+      <a class="btn" style="color:#fff;background:${T.blue};border-color:${T.blue}" href="${esc(a.url)}" target="_blank" rel="noreferrer">看原文 ↗</a>
+    </div></div>`;
+  document.body.appendChild(mask);
+}
+
+load();
+</script>
+</body>
+</html>
